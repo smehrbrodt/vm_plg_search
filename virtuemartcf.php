@@ -69,9 +69,9 @@ class plgSearchVirtuemartCF extends JPlugin {
                 $wheres2[] = 'a.product_s_desc LIKE ' . $text;
                 $wheres2[] = 'a.product_desc LIKE ' . $text;
                 $wheres2[] = 'b.category_name LIKE ' . $text;
+                $wheres2[] = 'cf.custom_value LIKE ' . $text;
                 $where = '(' . implode (') OR (', $wheres2) . ')';
                 break;
-
             case 'all':
             case 'any':
             default:
@@ -85,6 +85,7 @@ class plgSearchVirtuemartCF extends JPlugin {
                     $wheres2[] = 'a.product_s_desc LIKE ' . $word;
                     $wheres2[] = 'a.product_desc LIKE ' . $word;
                     $wheres2[] = 'b.category_name LIKE ' . $word;
+                    $wheres2[] = 'cf.custom_value LIKE ' . $word;
                     $wheres[] = implode (' OR ', $wheres2);
                 }
                 $where = '(' . implode (($phrase == 'all' ? ') AND (' : ') OR ('), $wheres) . ')';
@@ -131,7 +132,8 @@ class plgSearchVirtuemartCF extends JPlugin {
                     a.product_s_desc AS text,
                     b.category_name as section,
                     p.created_on as created,
-                    '2' AS browsernav
+                    '2' AS browsernav,
+                    cf.custom_value
                 FROM `#__virtuemart_products_" . VMLANG . "` AS a
                 JOIN #__virtuemart_products as p using (`virtuemart_product_id`)
                 LEFT JOIN `#__virtuemart_product_categories` AS xref
@@ -140,7 +142,12 @@ class plgSearchVirtuemartCF extends JPlugin {
                         ON b.`virtuemart_category_id` = xref.`virtuemart_category_id`
                 LEFT JOIN `#__virtuemart_product_shoppergroups` as `psgr`
                         ON (`psgr`.`virtuemart_product_id`=`a`.`virtuemart_product_id`)
-                WHERE {$where}
+                LEFT JOIN `#__virtuemart_product_customfields` AS cf
+                        ON cf.virtuemart_product_id = a.virtuemart_product_id
+                LEFT JOIN `#__virtuemart_customs` AS customs
+                        ON customs.virtuemart_custom_id = cf.virtuemart_customfield_id
+                WHERE
+                        {$where}
                         and p.published=1
                         AND $where_shopper_group"
             . (VmConfig::get('show_uncat_child_products') ? '' : ' and b.virtuemart_category_id>0 ')
