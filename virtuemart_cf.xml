@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="2.5" type="plugin" group="search" method="upgrade">
+    <name>plg_search_virtuemart_cf</name>
+    <creationDate>June 2014</creationDate>
+    <author>Samuel Mehrbrodt</author>
+    <authorEmail>s.mehrbrodt@gmail.com</authorEmail>
+    <copyright>Copyright (C) 2004-2014 Virtuemart Team; (C) 2014 Samuel Mehrbrodt. All rights reserved.</copyright>
+    <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+    <version>1.0</version>
+    <description>Allows searching of VirtueMart Products including custom fields</description>
+    <languages>
+        <language tag="en-GB">en-GB.plg_search_virtuemart.ini</language>
+    </languages>
+    <files>
+        <filename plugin="virtuemart_cf">virtuemart_cf.php</filename>
+        <filename>index.html</filename>
+    </files>
+    <config>
+        <fields name="params">
+            <fieldset name="basic">
+                <field name="search_limit" type="text"
+                       size="5"
+                       default="50"
+                       label="Search Limit"
+                       description="Number of Search items to return"
+                        />
+            </fieldset>
+
+        </fields>
+    </config>
+</extension>
