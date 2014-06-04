@@ -18,14 +18,14 @@
     <config>
         <fields name="params">
             <fieldset name="basic">
-                <field name="search_limit" type="text"
+                <field name="search_limit"
+                       type="text"
                        size="5"
                        default="50"
                        label="PLG_SEARCH_VM_CF_SEARCH_LIMIT"
                        description="PLG_SEARCH_VM_CF_SEARCH_LIMIT_DESC"
                         />
             </fieldset>
-
         </fields>
     </config>
 </extension>
