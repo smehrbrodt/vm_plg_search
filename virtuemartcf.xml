@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension version="2.5" type="plugin" group="search" method="upgrade">
-    <name>plg_search_virtuemart_cf</name>
-    <creationDate>June 2014</creationDate>
+    <name>plg_search_virtuemartcf</name>
     <author>Samuel Mehrbrodt</author>
     <authorEmail>s.mehrbrodt@gmail.com</authorEmail>
+    <creationDate>June 2014</creationDate>
     <copyright>(C) 2004-2014 Virtuemart Team; (C) 2014 Samuel Mehrbrodt. All rights reserved.</copyright>
     <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
     <version>1.0</version>
     <description>PLG_SEARCH_VM_CF_XML_DESCRIPTION</description>
     <languages folder="language">>
-        <language tag="en-GB">en-GB/en-GB.plg_search_virtuemart.sys.ini</language>
+        <language tag="en-GB">en-GB/en-GB.plg_search_virtuemart_cf.ini</language>
+        <language tag="en-GB">en-GB/en-GB.plg_search_virtuemart_cf.sys.ini</language>
     </languages>
     <files>
-        <filename plugin="virtuemart_cf">virtuemart_cf.php</filename>
+        <filename plugin="virtuemartcf">virtuemartcf.php</filename>
         <filename>index.html</filename>
     </files>
     <config>

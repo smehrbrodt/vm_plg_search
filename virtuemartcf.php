@@ -23,7 +23,7 @@ class plgSearchVirtuemartCF extends JPlugin {
     function onContentSearchAreas () {
         $this->loadLanguage();
         static $areas = array(
-            'virtuemart_cf' => 'PLG_SEARCH_VIRTUEMART_PRODUCTS'
+            'virtuemartcf' => 'PLG_SEARCH_VIRTUEMART_CF_PRODUCTS'
         );
         return $areas;
     }
