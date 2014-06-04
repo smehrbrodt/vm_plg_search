@@ -8,11 +8,8 @@
     <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
     <version>1.0</version>
     <description>PLG_SEARCH_VM_CF_XML_DESCRIPTION</description>
-    <languages folder="language">>
-        <language tag="en-GB">en-GB/en-GB.plg_search_virtuemart_cf.ini</language>
-        <language tag="en-GB">en-GB/en-GB.plg_search_virtuemart_cf.sys.ini</language>
-    </languages>
     <files>
+        <folder>language</folder>
         <filename plugin="virtuemartcf">virtuemartcf.php</filename>
         <filename>index.html</filename>
     </files>

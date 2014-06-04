@@ -62,7 +62,7 @@ class plgSearchVirtuemartCF extends JPlugin {
 
         switch ($phrase) {
             case 'exact':
-                $text = $db->Quote ('%' . $db->escape($text, TRUE) . '%', FALSE);
+                $text = $db->quote ("%$text%", TRUE);
                 $wheres2 = array();
                 $wheres2[] = 'p.product_sku LIKE ' . $text;
                 $wheres2[] = 'a.product_name LIKE ' . $text;
@@ -78,7 +78,7 @@ class plgSearchVirtuemartCF extends JPlugin {
                 $words = explode (' ', $text);
                 $wheres = array();
                 foreach ($words as $word) {
-                    $word = $db->Quote('%' . $db->escape($word, TRUE) . '%', FALSE);
+                    $word = $db->quote ("%$word%", TRUE);
                     $wheres2 = array();
                     $wheres2[] = 'p.product_sku LIKE ' . $word;
                     $wheres2[] = 'a.product_name LIKE ' . $word;
