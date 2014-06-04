@@ -16,7 +16,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 
-class plgSearchVirtuemartCF extends JPlugin {
+class PlgSearchVirtuemartCF extends JPlugin {
     /**
      * @return array An array of search areas
      */
@@ -33,10 +33,10 @@ class plgSearchVirtuemartCF extends JPlugin {
      * The sql must return the following fields that are used in a common display
      * routine: href, title, section, created, text, browsernav
      *
-     * @param string Target search string
-     * @param string mathcing option, exact|any|all
-     * @param string ordering option, newest|oldest|popular|alpha|category
-     * @param mixed An array if the search it to be restricted to areas, null if search all
+     * @param string $text Target search string
+     * @param string $phrase matching option, exact|any|all
+     * @param string $ordering ordering option, newest|oldest|popular|alpha|category
+     * @param mixed  $areas An array if the search it to be restricted to areas, null if search all
      *
      * @return array An array of database result objects
      */
@@ -49,7 +49,8 @@ class plgSearchVirtuemartCF extends JPlugin {
             }
         }
 
-        $limit = $this->params->def('search_limit', 50);
+        $limit = $this->params->get('search_limit', 50);
+        $search_customfields = bool($this->params->get('enable_customfields', TRUE));
 
         if (!class_exists('VmConfig')) {
             require(JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_virtuemart' . DS . 'helpers' . DS . 'config.php');
@@ -69,7 +70,8 @@ class plgSearchVirtuemartCF extends JPlugin {
                 $wheres2[] = 'a.product_s_desc LIKE ' . $text;
                 $wheres2[] = 'a.product_desc LIKE ' . $text;
                 $wheres2[] = 'b.category_name LIKE ' . $text;
-                $wheres2[] = 'cf.custom_value LIKE ' . $text;
+                if ($search_customfields)
+                    $wheres2[] = 'cf.custom_value LIKE ' . $text;
                 $where = '(' . implode (') OR (', $wheres2) . ')';
                 break;
             case 'all':
@@ -85,7 +87,8 @@ class plgSearchVirtuemartCF extends JPlugin {
                     $wheres2[] = 'a.product_s_desc LIKE ' . $word;
                     $wheres2[] = 'a.product_desc LIKE ' . $word;
                     $wheres2[] = 'b.category_name LIKE ' . $word;
-                    $wheres2[] = 'cf.custom_value LIKE ' . $word;
+                    if ($search_customfields)
+                        $wheres2[] = 'cf.custom_value LIKE ' . $word;
                     $wheres[] = implode (' OR ', $wheres2);
                 }
                 $where = '(' . implode (($phrase == 'all' ? ') AND (' : ') OR ('), $wheres) . ')';

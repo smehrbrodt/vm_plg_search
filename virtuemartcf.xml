@@ -20,9 +20,23 @@
                        type="text"
                        size="5"
                        default="50"
+                       filter="integer"
                        label="PLG_SEARCH_VM_CF_SEARCH_LIMIT"
                        description="PLG_SEARCH_VM_CF_SEARCH_LIMIT_DESC"
                         />
+                <field name="enable_customfields"
+                       type="radio"
+                       default="1"
+                       label="PLG_SEARCH_VM_CF_ENABLE_CF"
+                       description="PLG_SEARCH_VM_CF_ENABLE_CF_DESC">
+                    <option value="1">PLG_SEARCH_VM_CF_YES</option>
+                    <option value="0">PLG_SEARCH_VM_CF_NO</option>
+                </field>
+                <field name="customfields"
+                       type="text"
+                       size="10"
+                       label="PLG_SEARCH_VM_CF_CUSTOMFIELDS"
+                       description="PLG_SEARCH_VM_CF_CUSTOMFIELDS_DESC" />
             </fieldset>
         </fields>
     </config>
