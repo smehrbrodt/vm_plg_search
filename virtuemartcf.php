@@ -58,7 +58,7 @@ class PlgSearchVirtuemartCF extends JPlugin {
                 $category_field = 'customtitle';
                 break;
         }
-        $search_customfields = boolval($this->params->get('enable_customfields', TRUE));
+        $search_customfields = (bool) $this->params->get('enable_customfields', TRUE);
         $customfield_ids_condition = "";
         if ($search_customfields) {
             $value = trim($this->params->get('customfields', ""));
