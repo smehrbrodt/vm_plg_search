@@ -62,7 +62,7 @@ class plgSearchVirtuemartCF extends JPlugin {
 
         switch ($phrase) {
             case 'exact':
-                $text = $db->Quote ('%' . $db->getEscaped ($text, TRUE) . '%', FALSE);
+                $text = $db->Quote ('%' . $db->escape($text, TRUE) . '%', FALSE);
                 $wheres2 = array();
                 $wheres2[] = 'p.product_sku LIKE ' . $text;
                 $wheres2[] = 'a.product_name LIKE ' . $text;
