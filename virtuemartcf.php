@@ -50,6 +50,14 @@ class PlgSearchVirtuemartCF extends JPlugin {
         }
 
         $limit = $this->params->get('search_limit', 50);
+        switch($this->params->get('subtitledisplay', '1')) {
+            case '1':
+                $category_field = 'category_name';
+                break;
+            case '2':
+                $category_field = 'customtitle';
+                break;
+        }
         $search_customfields = boolval($this->params->get('enable_customfields', TRUE));
         $customfield_ids_condition = "";
         if ($search_customfields) {
@@ -149,17 +157,18 @@ class PlgSearchVirtuemartCF extends JPlugin {
 
         $query = "
                 SELECT DISTINCT
-                    CONCAT( a.product_name,' (',p.product_sku,')' ) AS title,
+                    CONCAT( a.product_name, ' (', p.product_sku, ')' ) AS title,
                     a.virtuemart_product_id,
-                    b.virtuemart_category_id,
                     a.product_s_desc AS text,
-                    b.category_name as section,
                     p.created_on as created,
                     '2' AS browsernav,
-                    customs.virtuemart_custom_id,
-                    cf.custom_value
+                    GROUP_CONCAT(DISTINCT b.$category_field
+                        ORDER BY b.$category_field SEPARATOR ', ') as section,
+                    (SELECT pc2.virtuemart_category_id
+                        FROM #__virtuemart_product_categories as pc2
+                        WHERE pc2.virtuemart_product_id = a.virtuemart_product_id LIMIT 1) AS cat_id
                 FROM `#__virtuemart_products_" . VMLANG . "` AS a
-                JOIN #__virtuemart_products as p using (`virtuemart_product_id`)
+                JOIN #__virtuemart_products AS p USING (`virtuemart_product_id`)
                 LEFT JOIN `#__virtuemart_product_categories` AS xref
                         ON xref.`virtuemart_product_id` = a.`virtuemart_product_id`
                 LEFT JOIN `#__virtuemart_categories_" . VMLANG . "` AS b
@@ -176,6 +185,7 @@ class PlgSearchVirtuemartCF extends JPlugin {
                         $shopper_group_condition
                         $customfield_ids_condition
                         $uncategorized_products_condition
+                GROUP BY xref.virtuemart_product_id
                 ORDER BY $order";
         $db->setQuery($query, 0, $limit);
 
@@ -183,7 +193,7 @@ class PlgSearchVirtuemartCF extends JPlugin {
         if ($rows) {
             foreach ($rows as $key => $row) {
                 $rows[$key]->href = 'index.php?option=com_virtuemart&view=productdetails&virtuemart_product_id=' .
-                    $row->virtuemart_product_id . '&virtuemart_category_id=' . $row->virtuemart_category_id;
+                    $row->virtuemart_product_id . '&virtuemart_category_id=' . $row->cat_id;
             }
         }
         return $rows;

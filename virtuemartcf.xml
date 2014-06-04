@@ -37,6 +37,13 @@
                        size="10"
                        label="PLG_SEARCH_VM_CF_CUSTOMFIELDS"
                        description="PLG_SEARCH_VM_CF_CUSTOMFIELDS_DESC" />
+                <field name="subtitledisplay"
+                       type="list"
+                       label="PLG_SEARCH_VM_CF_TITLE"
+                       description="PLG_SEARCH_VM_CF_TITLE_DESC">
+                    <option value="1">PLG_SEARCH_VM_CF_TITLE_CATEGORY</option>
+                    <option value="2">PLG_SEARCH_VM_CF_TITLE_CATEGORY_CUSTOMTITLE</option>
+                </field>
             </fieldset>
         </fields>
     </config>
