@@ -68,7 +68,6 @@ class PlgSearchVirtuemartCF extends JPlugin {
             }
 
         }
-        //die($customfield_ids_condition);
 
         if (!class_exists('VmConfig')) {
             require(JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_virtuemart' . DS . 'helpers' . DS . 'config.php');
@@ -132,7 +131,7 @@ class PlgSearchVirtuemartCF extends JPlugin {
                 $order = 'a.product_name ASC';
         }
 
-        $where_shopper_group="";
+        $shopper_group_condition="";
         $currentVMuser = VmModel::getModel('user')->getUser();
         $virtuemart_shoppergroup_ids = (array)$currentVMuser->shopper_groups;
 
@@ -142,8 +141,11 @@ class PlgSearchVirtuemartCF extends JPlugin {
                 $sgrgroups[] = 'psgr.`virtuemart_shoppergroup_id`= "' . (int)$virtuemart_shoppergroup_id . '" ';
             }
             $sgrgroups[] = 'psgr.`virtuemart_shoppergroup_id` IS NULL ';
-            $where_shopper_group = "( " . implode (' OR ', $sgrgroups) . " ) ";
+            $shopper_group_condition = "AND ( " . implode (' OR ', $sgrgroups) . " ) ";
         }
+
+        $uncategorized_products_condition = VmConfig::get('show_uncat_child_products') ?
+                '' : 'AND b.virtuemart_category_id > 0 ';
 
         $query = "
                 SELECT DISTINCT
@@ -169,12 +171,12 @@ class PlgSearchVirtuemartCF extends JPlugin {
                 LEFT JOIN `#__virtuemart_customs` AS customs
                         ON customs.virtuemart_custom_id = cf.virtuemart_customfield_id
                 WHERE
-                        {$where}
-                        and p.published=1
-                        AND $where_shopper_group
-                        $customfield_ids_condition "
-            . (VmConfig::get('show_uncat_child_products') ? '' : ' AND b.virtuemart_category_id>0 ')
-            . ' ORDER BY ' . $order;
+                        $where
+                        AND p.published=1
+                        $shopper_group_condition
+                        $customfield_ids_condition
+                        $uncategorized_products_condition
+                ORDER BY $order";
         $db->setQuery($query, 0, $limit);
 
         $rows = $db->loadObjectList();
