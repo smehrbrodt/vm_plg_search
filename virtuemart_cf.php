@@ -4,9 +4,9 @@
  * Search plugin for virtuemart.
  * Based on the official Virtuemart search plugin.
  *
- * @copyright  Copyright (C) 2004-2008 soeren - All rights reserved.
- * @copyright  Copyright (C) 2014 Samuel Mehrbrodt
- * @license    http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE
+ * @copyright Copyright (C) 2004-2008 soeren - All rights reserved.
+ *                          2014 Samuel Mehrbrodt
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE
  * VirtueMart is free software. This version may have been modified pursuant
  * to the GNU General Public License, and as distributed it includes or
  * is derivative of works licensed under the GNU General Public License or
@@ -37,35 +37,29 @@ class plgSearchVirtuemartCF extends JPlugin {
      * @param string mathcing option, exact|any|all
      * @param string ordering option, newest|oldest|popular|alpha|category
      * @param mixed An array if the search it to be restricted to areas, null if search all
+     *
+     * @return array An array of database result objects
      */
     function onContentSearch ($text, $phrase = '', $ordering = '', $areas = NULL) {
-        $db = JFactory::getDbo ();
-        $app = JFactory::getApplication ();
-        $user = JFactory::getUser ();
-        $groups = implode (',', $user->getAuthorisedViewLevels ());
-        $tag = JFactory::getLanguage ()->getTag ();
-        $searchText = $text;
+        $db = JFactory::getDbo();
 
-        if (is_array ($areas)) {
-            if (!array_intersect ($areas, array_keys ($this->onContentSearchAreas ()))) {
+        if (is_array($areas)) {
+            if (!array_intersect ($areas, array_keys ($this->onContentSearchAreas()))) {
                 return array();
             }
         }
 
         $limit = $this->params->def('search_limit', 50);
 
-        if (!class_exists ('VmConfig')) {
+        if (!class_exists('VmConfig')) {
             require(JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_virtuemart' . DS . 'helpers' . DS . 'config.php');
         }
-        VmConfig::loadConfig ();
+        VmConfig::loadConfig();
 
-        $text = trim ($text);
-        if ($text == '') {
+        $text = trim($text);
+        if (empty($text))
             return array();
-        }
 
-        $section = JText::_ ('Products');
-        $wheres = array();
         switch ($phrase) {
             case 'exact':
                 $text = $db->Quote ('%' . $db->getEscaped ($text, TRUE) . '%', FALSE);
@@ -84,7 +78,7 @@ class plgSearchVirtuemartCF extends JPlugin {
                 $words = explode (' ', $text);
                 $wheres = array();
                 foreach ($words as $word) {
-                    $word = $db->Quote ('%' . $db->getEscaped ($word, TRUE) . '%', FALSE);
+                    $word = $db->Quote('%' . $db->escape($word, TRUE) . '%', FALSE);
                     $wheres2 = array();
                     $wheres2[] = 'p.product_sku LIKE ' . $word;
                     $wheres2[] = 'a.product_name LIKE ' . $word;
@@ -96,15 +90,13 @@ class plgSearchVirtuemartCF extends JPlugin {
                 $where = '(' . implode (($phrase == 'all' ? ') AND (' : ') OR ('), $wheres) . ')';
                 break;
         }
-        switch ($ordering) {
+        switch($ordering) {
             case 'alpha':
                 $order = 'a.product_name ASC';
                 break;
-
             case 'category':
                 $order = 'b.category_name ASC, a.product_name ASC';
                 break;
-
             case 'popular':
                 $order = 'a.product_name ASC';
                 break;
@@ -115,25 +107,22 @@ class plgSearchVirtuemartCF extends JPlugin {
                 $order = 'p.created_on ASC';
                 break;
             default:
-                $order = 'a.product_name DESC';
+                $order = 'a.product_name ASC';
         }
 
         $where_shopper_group="";
-        $usermodel = VmModel::getModel ('user');
-        $currentVMuser = $usermodel->getUser ();
+        $currentVMuser = VmModel::getModel('user')->getUser();
         $virtuemart_shoppergroup_ids = (array)$currentVMuser->shopper_groups;
 
-        if (is_array ($virtuemart_shoppergroup_ids)) {
+        if (is_array($virtuemart_shoppergroup_ids)) {
             $sgrgroups = array();
-            foreach ($virtuemart_shoppergroup_ids as   $virtuemart_shoppergroup_id) {
+            foreach($virtuemart_shoppergroup_ids as $virtuemart_shoppergroup_id) {
                 $sgrgroups[] = 'psgr.`virtuemart_shoppergroup_id`= "' . (int)$virtuemart_shoppergroup_id . '" ';
             }
             $sgrgroups[] = 'psgr.`virtuemart_shoppergroup_id` IS NULL ';
             $where_shopper_group = "( " . implode (' OR ', $sgrgroups) . " ) ";
         }
 
-        //TODO  b.virtuemart_category_id>0 should be configurable
-        $text = $db->Quote ('%' . $db->getEscaped ($text, TRUE) . '%', FALSE);
         $query = "
                 SELECT DISTINCT
                     CONCAT( a.product_name,' (',p.product_sku,')' ) AS title,
@@ -154,16 +143,15 @@ class plgSearchVirtuemartCF extends JPlugin {
                 WHERE {$where}
                         and p.published=1
                         AND $where_shopper_group"
-            . (VmConfig::get ('show_uncat_child_products') ? '' : ' and b.virtuemart_category_id>0 ')
+            . (VmConfig::get('show_uncat_child_products') ? '' : ' and b.virtuemart_category_id>0 ')
             . ' ORDER BY ' . $order;
-        $db->setQuery ($query, 0, $limit);
+        $db->setQuery($query, 0, $limit);
 
-        $rows = $db->loadObjectList ();
+        $rows = $db->loadObjectList();
         if ($rows) {
             foreach ($rows as $key => $row) {
                 $rows[$key]->href = 'index.php?option=com_virtuemart&view=productdetails&virtuemart_product_id=' .
-                    $row->virtuemart_product_id .
-                    '&virtuemart_category_id=' . $row->virtuemart_category_id;
+                    $row->virtuemart_product_id . '&virtuemart_category_id=' . $row->virtuemart_category_id;
             }
         }
         return $rows;
