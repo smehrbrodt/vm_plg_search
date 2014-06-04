@@ -50,7 +50,25 @@ class PlgSearchVirtuemartCF extends JPlugin {
         }
 
         $limit = $this->params->get('search_limit', 50);
-        $search_customfields = bool($this->params->get('enable_customfields', TRUE));
+        $search_customfields = boolval($this->params->get('enable_customfields', TRUE));
+        $customfield_ids_condition = "";
+        if ($search_customfields) {
+            $value = trim($this->params->get('customfields', ""));
+
+            // Remove all spaces
+            $value = str_replace(' ', '', $value);
+            if (!empty($value)){
+                $customfield_ids = explode(",", $value);
+
+                // Make sure we have only integers
+                foreach($customfield_ids as &$id) {
+                    $id = intval($id);
+                }
+                $customfield_ids_condition = "AND cf.virtuemart_custom_id IN (" . implode(',', $customfield_ids) . ")";
+            }
+
+        }
+        //die($customfield_ids_condition);
 
         if (!class_exists('VmConfig')) {
             require(JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_virtuemart' . DS . 'helpers' . DS . 'config.php');
@@ -136,6 +154,7 @@ class PlgSearchVirtuemartCF extends JPlugin {
                     b.category_name as section,
                     p.created_on as created,
                     '2' AS browsernav,
+                    customs.virtuemart_custom_id,
                     cf.custom_value
                 FROM `#__virtuemart_products_" . VMLANG . "` AS a
                 JOIN #__virtuemart_products as p using (`virtuemart_product_id`)
@@ -152,8 +171,9 @@ class PlgSearchVirtuemartCF extends JPlugin {
                 WHERE
                         {$where}
                         and p.published=1
-                        AND $where_shopper_group"
-            . (VmConfig::get('show_uncat_child_products') ? '' : ' and b.virtuemart_category_id>0 ')
+                        AND $where_shopper_group
+                        $customfield_ids_condition "
+            . (VmConfig::get('show_uncat_child_products') ? '' : ' AND b.virtuemart_category_id>0 ')
             . ' ORDER BY ' . $order;
         $db->setQuery($query, 0, $limit);
 
