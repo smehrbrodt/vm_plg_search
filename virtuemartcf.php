@@ -75,8 +75,8 @@ class PlgSearchVirtuemartCF extends JPlugin {
                     $id = intval($id);
                 }
                 // The custom field ID must be either in the list specified or NULL.
-                $customfield_ids_condition = "AND cf.virtuemart_custom_id IN (" .
-                    implode(',', $customfield_ids) . ", NULL)";
+                $customfield_ids_condition = "cf.virtuemart_custom_id IN (" .
+                    implode(',', $customfield_ids) . ")";
             }
 
         }
@@ -103,7 +103,7 @@ class PlgSearchVirtuemartCF extends JPlugin {
                 if ($search_product_description)
                     $wheres2[] = "a.product_desc LIKE $text";
                 if ($search_customfields)
-                    $wheres2[] = "cf.custom_value LIKE $text";
+                    $wheres2[] = "(cf.custom_value LIKE $text AND $customfield_ids_condition)";
                 $where = '(' . implode (') OR (', $wheres2) . ')';
                 break;
             case 'all':
@@ -123,7 +123,7 @@ class PlgSearchVirtuemartCF extends JPlugin {
                     if ($search_product_description)
                     $wheres2[] = "a.product_desc LIKE $word";
                     if ($search_customfields)
-                        $wheres2[] = "cf.custom_value LIKE $word";
+                        $wheres2[] = "(cf.custom_value LIKE $word AND $customfield_ids_condition)";
 
                     $wheres[] = implode (' OR ', $wheres2);
                 }
@@ -194,7 +194,6 @@ class PlgSearchVirtuemartCF extends JPlugin {
                         $where
                         AND p.published=1
                         $shopper_group_condition
-                        $customfield_ids_condition
                         $uncategorized_products_condition
                 GROUP BY xref.virtuemart_product_id
                 ORDER BY $order";
