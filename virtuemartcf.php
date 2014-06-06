@@ -58,6 +58,8 @@ class PlgSearchVirtuemartCF extends JPlugin {
                 $category_field = 'customtitle';
                 break;
         }
+        $search_product_description = (bool) $this->params->get('enable_product_description_search', TRUE);
+        $search_product_s_description = (bool) $this->params->get('enable_product_short_description_search', TRUE);
         $search_customfields = (bool) $this->params->get('enable_customfields', TRUE);
         $customfield_ids_condition = "";
         if ($search_customfields) {
@@ -92,12 +94,14 @@ class PlgSearchVirtuemartCF extends JPlugin {
             case 'exact':
                 $wheres2 = array();
                 // product_sku should be exact match
-                $wheres2[] = "p.product_sku=$text";
-                $text = $db->quote ("%$text%", TRUE);
+                $wheres2[] = "p.product_sku=" . $db->quote($text, TRUE);
+                $text = $db->quote("%$text%", TRUE);
                 $wheres2[] = "a.product_name LIKE $text";
-                $wheres2[] = "a.product_s_desc LIKE $text";
-                $wheres2[] = "a.product_desc LIKE $text";
                 $wheres2[] = "b.$category_field LIKE $text";
+                if ($search_product_s_description)
+                    $wheres2[] = "a.product_s_desc LIKE $text";
+                if ($search_product_description)
+                    $wheres2[] = "a.product_desc LIKE $text";
                 if ($search_customfields)
                     $wheres2[] = "cf.custom_value LIKE $text";
                 $where = '(' . implode (') OR (', $wheres2) . ')';
@@ -110,12 +114,14 @@ class PlgSearchVirtuemartCF extends JPlugin {
                 foreach ($words as $word) {
                     $wheres2 = array();
                     // product_sku should be exact match
-                    $wheres2[] = "p.product_sku=$word";
-                    $word = $db->quote ("$word", TRUE);
+                    $wheres2[] = "p.product_sku=" . $db->quote($word, TRUE);
+                    $word = $db->quote("%$word%", TRUE);
                     $wheres2[] = "a.product_name LIKE $word";
-                    $wheres2[] = "a.product_s_desc LIKE $word";
-                    $wheres2[] = "a.product_desc LIKE $word";
                     $wheres2[] = "b.$category_field LIKE $word";
+                    if ($search_product_s_description)
+                        $wheres2[] = "a.product_s_desc LIKE $word";
+                    if ($search_product_description)
+                    $wheres2[] = "a.product_desc LIKE $word";
                     if ($search_customfields)
                         $wheres2[] = "cf.custom_value LIKE $word";
 
