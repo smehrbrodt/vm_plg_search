@@ -72,7 +72,9 @@ class PlgSearchVirtuemartCF extends JPlugin {
                 foreach($customfield_ids as &$id) {
                     $id = intval($id);
                 }
-                $customfield_ids_condition = "AND cf.virtuemart_custom_id IN (" . implode(',', $customfield_ids) . ")";
+                // The custom field ID must be either in the list specified or NULL.
+                $customfield_ids_condition = "AND cf.virtuemart_custom_id IN (" .
+                    implode(',', $customfield_ids) . ", NULL)";
             }
 
         }
@@ -88,15 +90,16 @@ class PlgSearchVirtuemartCF extends JPlugin {
 
         switch ($phrase) {
             case 'exact':
-                $text = $db->quote ("%$text%", TRUE);
                 $wheres2 = array();
-                $wheres2[] = 'p.product_sku LIKE ' . $text;
-                $wheres2[] = 'a.product_name LIKE ' . $text;
-                $wheres2[] = 'a.product_s_desc LIKE ' . $text;
-                $wheres2[] = 'a.product_desc LIKE ' . $text;
-                $wheres2[] = 'b.category_name LIKE ' . $text;
+                // product_sku should be exact match
+                $wheres2[] = "p.product_sku=$text";
+                $text = $db->quote ("%$text%", TRUE);
+                $wheres2[] = "a.product_name LIKE $text";
+                $wheres2[] = "a.product_s_desc LIKE $text";
+                $wheres2[] = "a.product_desc LIKE $text";
+                $wheres2[] = "b.$category_field LIKE $text";
                 if ($search_customfields)
-                    $wheres2[] = 'cf.custom_value LIKE ' . $text;
+                    $wheres2[] = "cf.custom_value LIKE $text";
                 $where = '(' . implode (') OR (', $wheres2) . ')';
                 break;
             case 'all':
@@ -105,15 +108,17 @@ class PlgSearchVirtuemartCF extends JPlugin {
                 $words = explode (' ', $text);
                 $wheres = array();
                 foreach ($words as $word) {
-                    $word = $db->quote ("%$word%", TRUE);
                     $wheres2 = array();
-                    $wheres2[] = 'p.product_sku LIKE ' . $word;
-                    $wheres2[] = 'a.product_name LIKE ' . $word;
-                    $wheres2[] = 'a.product_s_desc LIKE ' . $word;
-                    $wheres2[] = 'a.product_desc LIKE ' . $word;
-                    $wheres2[] = 'b.category_name LIKE ' . $word;
+                    // product_sku should be exact match
+                    $wheres2[] = "p.product_sku=$word";
+                    $word = $db->quote ("$word", TRUE);
+                    $wheres2[] = "a.product_name LIKE $word";
+                    $wheres2[] = "a.product_s_desc LIKE $word";
+                    $wheres2[] = "a.product_desc LIKE $word";
+                    $wheres2[] = "b.$category_field LIKE $word";
                     if ($search_customfields)
-                        $wheres2[] = 'cf.custom_value LIKE ' . $word;
+                        $wheres2[] = "cf.custom_value LIKE $word";
+
                     $wheres[] = implode (' OR ', $wheres2);
                 }
                 $where = '(' . implode (($phrase == 'all' ? ') AND (' : ') OR ('), $wheres) . ')';
