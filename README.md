@@ -7,6 +7,7 @@ Compared to the stock plugin it has the following improvements:
   * Configure what is displayed in the Subtitle
   * Don't show duplicate results when a product appears in multiple categories.
   * Searching product description can be disabled
+  * Product thumbnail can be displayed (Template needs to be adjusted)
 
 Installation
 ------------

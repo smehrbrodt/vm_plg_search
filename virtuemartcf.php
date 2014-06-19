@@ -173,6 +173,7 @@ class PlgSearchVirtuemartCF extends JPlugin {
                     a.product_s_desc AS text,
                     p.created_on as created,
                     '2' AS browsernav,
+                    medias.file_url_thumb as image,
                     GROUP_CONCAT(DISTINCT b.$category_field
                         ORDER BY b.$category_field SEPARATOR ', ') as section,
                     (SELECT pc2.virtuemart_category_id
@@ -186,6 +187,10 @@ class PlgSearchVirtuemartCF extends JPlugin {
                         ON b.`virtuemart_category_id` = xref.`virtuemart_category_id`
                 LEFT JOIN `#__virtuemart_product_shoppergroups` as `psgr`
                         ON (`psgr`.`virtuemart_product_id`=`a`.`virtuemart_product_id`)
+                LEFT JOIN `#__virtuemart_product_medias` AS pr_md
+                        ON pr_md.`virtuemart_product_id` = a.`virtuemart_product_id`
+                LEFT JOIN `#__virtuemart_medias` AS medias
+                        ON pr_md.`virtuemart_media_id` = medias.`virtuemart_media_id`
                 LEFT JOIN `#__virtuemart_product_customfields` AS cf
                         ON cf.virtuemart_product_id = a.virtuemart_product_id
                 LEFT JOIN `#__virtuemart_customs` AS customs
@@ -195,6 +200,7 @@ class PlgSearchVirtuemartCF extends JPlugin {
                         AND p.published=1
                         $shopper_group_condition
                         $uncategorized_products_condition
+                        AND pr_md.ordering=1  # Only select the first image
                 GROUP BY xref.virtuemart_product_id
                 ORDER BY $order";
         $db->setQuery($query, 0, $limit);
