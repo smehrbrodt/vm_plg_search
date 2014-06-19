@@ -210,6 +210,8 @@ class PlgSearchVirtuemartCF extends JPlugin {
             foreach ($rows as $key => $row) {
                 $rows[$key]->href = 'index.php?option=com_virtuemart&view=productdetails&virtuemart_product_id=' .
                     $row->virtuemart_product_id . '&virtuemart_category_id=' . $row->cat_id;
+                if (!empty($rows[$key]->image))
+                    $rows[$key]->image =  JURI::root() . $rows[$key]->image;
             }
         }
         return $rows;
