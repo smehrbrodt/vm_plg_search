@@ -95,6 +95,7 @@ class PlgSearchVirtuemartCF extends JPlugin {
                 $wheres2 = array();
                 // product_sku should be exact match
                 $wheres2[] = "p.product_sku=" . $db->quote($text, TRUE);
+                $wheres2[] = "p.product_gtin=" . $db->quote($text, TRUE);
                 $text = $db->quote("%$text%", TRUE);
                 $wheres2[] = "a.product_name LIKE $text";
                 $wheres2[] = "b.$category_field LIKE $text";
@@ -115,6 +116,7 @@ class PlgSearchVirtuemartCF extends JPlugin {
                     $wheres2 = array();
                     // product_sku should be exact match
                     $wheres2[] = "p.product_sku=" . $db->quote($word, TRUE);
+                    $wheres2[] = "p.product_gtin=" . $db->quote($text, TRUE);
                     $word = $db->quote("%$word%", TRUE);
                     $wheres2[] = "a.product_name LIKE $word";
                     $wheres2[] = "b.$category_field LIKE $word";
